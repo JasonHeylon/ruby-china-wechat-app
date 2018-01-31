@@ -23,24 +23,28 @@ export default class extends wepy.app {
       'pages/topic'
     ],
     window: {
-      backgroundTextStyle: 'light',
-      navigationBarBackgroundColor: '#fff',
-      navigationBarTitleText: 'WeChat',
-      navigationBarTextStyle: 'black'
+      backgroundTextStyle: 'dark',
+      navigationBarBackgroundColor: '#E84920',
+      navigationBarTitleText: 'Ruby China',
+      navigationBarTextStyle: 'white'
     },
     tabBar: {
       list: [
         {
           pagePath: 'pages/popular',
-          text: '精华'
+          text: '精华',
+          selectedColor: '#E84920',
+          color: '#fff'
         },
         {
           pagePath: 'pages/topics',
-          text: '社区'
+          text: '社区',
+          selectedColor: '#E84920'
         },
         {
           pagePath: 'pages/jobs',
-          text: '招聘'
+          text: '招聘',
+          selectedColor: '#E84920'
         }
 
       ]

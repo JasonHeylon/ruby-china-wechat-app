@@ -1,0 +1,47 @@
+<style lang="scss">
+  .topic-item {
+    width: 100%;
+    font-size: 30rpx;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+
+    .avatar {
+      border-radius: 120rpx;
+    }
+  }
+</style>
+
+<template>
+  <view class="topic-item" @tap="tapTopic">
+    {{ topic.title }} - {{ topic.user.name.length > 0 ? topic.user.name : topic.user.login }}
+    {{this.topic.created_at}}
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+
+export default class TopicItem extends wepy.component {
+  props = {
+    topic: {
+      default: {}
+    }
+  }
+
+  data = {
+  }
+
+  computed = {
+
+  }
+
+
+  methods = {
+    tapTopic () {
+      wepy.navigateTo({
+        url: `/pages/topic?id=${this.topic.id}`
+      })
+    }
+  }
+}
+</script>

@@ -3,7 +3,9 @@
 </style>
 
 <template>
-
+<view>
+  {{topic.title}}
+</view>
 </template>
 
 <script>
@@ -15,7 +17,7 @@ export default class Topic extends wepy.page {
   }
 
   data = {
-    topics: [],
+    topic: {},
     page: 1,
     perPage: 30
   }
@@ -24,9 +26,20 @@ export default class Topic extends wepy.page {
 
   }
 
-  methods = {
-
+  setTitle (title) {
+    wepy.setNavigationBarTitle({
+      title: title
+    })
   }
+
+  methods = {
+    onLoad: function(option){
+      this.setTitle('test')
+      console.log(option.id)
+    }
+  }
+
+
 }
 
 </script>

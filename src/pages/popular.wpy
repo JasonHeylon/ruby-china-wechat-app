@@ -1,39 +1,30 @@
 <style lang="scss">
-  .topic-item {
-    width: 100%;
-    font-size: 30rpx;
-    padding: 10px;
-    border-bottom: 1px solid #eee;
-
-    .avatar {
-      border-radius: 120rpx;
-    }
-  }
 
 </style>
 
-
-
 <template>
   <view>
-    <view wx:for="{{topics}}" wx:for-index="idx" wx:for-item="topic" wx:key="idx" class="topic-item">
-      <image style="width: 20px; height: 20px;" mode="aspectFit" src="{{topic.user.avatar_url}}" class="avatar"></image>
-      {{topic.title}} -
-      {{topic.updated_at}}
+    <repeat for="{{topics}}" index="index" item="topic" key="topic.id">
 
-      / <icon type="success" size="25"/>
-    </view>
+      <topic-item :topic="topic">
+      </topic-item>
+    </repeat>
   </view>
 </template>
 
 <script>
 import wepy from 'wepy'
 import api from '../mixins/api'
+import TopicItem from '../components/topicItem'
 
 export default class Popular extends wepy.page {
   config = {
     navigationBarTitleText: '精华帖子',
     enablePullDownRefresh: true
+  }
+
+  components = {
+    'topic-item': TopicItem
   }
   data = {
     topics: [],
@@ -42,6 +33,7 @@ export default class Popular extends wepy.page {
   }
 
   computed = {
+
   }
 
   methods = {
@@ -50,16 +42,25 @@ export default class Popular extends wepy.page {
       this.fetchData()
     }
   }
-  onShow () {
+  onLoad () {
     console.log('loaded popular')
     this.fetchData()
   }
 
+  onPullDownRefresh (){
+    console.log('refresh')
+    this.fetchData()
+  }
+
   fetchData () {
+    wepy.showNavigationBarLoading()
     api.queryPopularTopics(1).then((data) => {
       this.topics = data.topics
       this.$apply()
-      console.log(data)
+
+      console.log(this.topics)
+      wepy.hideNavigationBarLoading()
+      wepy.stopPullDownRefresh()
     })
   }
 }
