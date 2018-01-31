@@ -1,14 +1,15 @@
-<style language="scss">
-.topic-item{
-  width: 100%;
-  font-size: .8rem;
-  padding: 10px;
-  border-bottom: 1px solid #eee;
+<style lang="scss">
+  .topic-item {
+    width: 100%;
+    font-size: 30rpx;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
 
-}
-  .avatar{
-    border-radius: 120px;
+    .avatar {
+      border-radius: 120rpx;
+    }
   }
+
 </style>
 
 
@@ -19,6 +20,8 @@
       <image style="width: 20px; height: 20px;" mode="aspectFit" src="{{topic.user.avatar_url}}" class="avatar"></image>
       {{topic.title}} -
       {{topic.updated_at}}
+
+      / <icon type="success" size="25"/>
     </view>
   </view>
 </template>
@@ -29,7 +32,8 @@ import api from '../mixins/api'
 
 export default class Popular extends wepy.page {
   config = {
-    navigationBarTitleText: '精华帖子'
+    navigationBarTitleText: '精华帖子',
+    enablePullDownRefresh: true
   }
   data = {
     topics: [],

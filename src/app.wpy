@@ -1,4 +1,4 @@
-<style lang='less'>
+<style lang='scss'>
 .container {
   height: 100%;
   display: flex;
@@ -17,7 +17,6 @@ import Promise from 'promise-polyfill'
 export default class extends wepy.app {
   config = {
     pages: [
-      // 'pages/index',
       'pages/popular',
       'pages/topics',
       'pages/jobs',
