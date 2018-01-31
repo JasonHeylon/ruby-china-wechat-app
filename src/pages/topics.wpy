@@ -1,0 +1,32 @@
+<style>
+
+</style>
+
+<template>
+
+</template>
+
+<script>
+import wepy from 'wepy'
+
+export default class Topics extends wepy.page {
+  config = {
+    navigationBarTitleText: '帖子'
+  }
+
+  data = {
+    topics: [],
+    page: 1,
+    perPage: 30
+  }
+
+  computed = {
+
+  }
+
+  methods = {
+
+  }
+}
+
+</script>

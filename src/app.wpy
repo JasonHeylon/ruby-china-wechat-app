@@ -1,4 +1,4 @@
-<style lang="less">
+<style lang='less'>
 .container {
   height: 100%;
   display: flex;
@@ -12,18 +12,41 @@
 <script>
 import wepy from 'wepy'
 import 'wepy-async-function'
+import Promise from 'promise-polyfill'
 
 export default class extends wepy.app {
   config = {
     pages: [
-      'pages/index'
+      // 'pages/index',
+      'pages/popular',
+      'pages/topics',
+      'pages/jobs',
+      'pages/topic'
     ],
     window: {
       backgroundTextStyle: 'light',
       navigationBarBackgroundColor: '#fff',
       navigationBarTitleText: 'WeChat',
       navigationBarTextStyle: 'black'
-    }
+    },
+    tabBar: {
+      list: [
+        {
+          pagePath: 'pages/popular',
+          text: '精华'
+        },
+        {
+          pagePath: 'pages/topics',
+          text: '社区'
+        },
+        {
+          pagePath: 'pages/jobs',
+          text: '招聘'
+        }
+
+      ]
+    },
+    debug: true
   }
 
   globalData = {
@@ -33,10 +56,11 @@ export default class extends wepy.app {
   constructor () {
     super()
     this.use('requestfix')
+    this.use('promisify')
   }
 
   onLaunch() {
-    this.testAsync()
+    // this.testAsync()
   }
 
   sleep (s) {
