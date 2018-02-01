@@ -1,29 +1,182 @@
-<style>
+<style lang="scss">
+  @import '../plugins/wemark.scss';
+  .topic-detail {
+    .topic-head {
+      background-color: #fafafa;
+      padding: 10rpx 20rpx;
+      margin-bottom: 30rpx;
+    }
+    .topic-title  {
+      position: relative;
+      font-weight: bold;
+      display: flex;
+      image {
+        width: 80rpx;
+        height: 80rpx;
+        border-radius: 50%;
+        background-color:#ddd;
+      }
+    }
+    .topic-desc {
+      color: #777;
+      font-size: .8rem;
+    }
+    .topic-body {
+      padding: 20rpx;
+    }
+    .topic-stat {
+      font-size: .8rem;
+      background-color:#fafafa;
+      color:#666;
+      padding:20rpx;
 
+      border: 1px solid #eee;
+      border-left: 0;
+      border-right: 0;
+    }
+
+    .reply-item {
+      padding: 10rpx 20rpx;
+      border-bottom: 1px solid #e1e1e1;
+      image {
+        width: 80rpx;
+        height: 80rpx;
+        border-radius: 50%;
+        background-color:#ddd;
+      }
+    }
+  }
 </style>
 
 <template>
-<view>
-  {{topic.title}}
-</view>
+  <view class="topic-detail">
+    <import src="../plugins/wemark.wxml" />
+    <view class="topic-head">
+      <view class="topic-title">
+        {{ topic.title }}
+        <image mode="aspectFill" src="{{topic.user.avatar_url}}"></image>
+      </view>
+      <view class="topic-desc">
+        {{ topic.user.name ? topic.user.name : topic.user.login }}
+        - 发布于 {{ createdDate }}
+        - {{ topic.hits }} 次阅读
+      </view>
+
+    </view>
+
+    <view class="topic-body">
+      <template is="wemark" data="{{...parsedBody}}"></template>
+    </view>
+
+    <view class="topic-stat">
+      共收到{{topic.replies_count}} 个回复， {{ topic.likes_count }} 个赞
+    </view>
+
+    <view class="reply-list">
+      <view wx:if="{{isLoadingReplies}}">
+        加载回复中...
+      </view>
+      <repeat for="{{replies}}" index="index" item="reply" key="reply.id">
+        <view class="reply-item">
+          <view>
+            <image mode="aspectFill" src="{{reply.user.avatar_url}}"></image>
+            {{reply.user.login}}
+          </view>
+          <view class="reply-body">
+            <template is="wemark" data="{{...reply.parsedBody}}"></template>
+          </view>
+          <view class="reply-footer">
+            {{ reply.created_at }}
+          </view>
+
+        </view>
+      </repeat>
+    </view>
+  </view>
 </template>
 
 <script>
 import wepy from 'wepy'
+import api from '../mixins/api'
+import wemark from '../plugins/wemark'
+import moment from 'moment'
 
 export default class Topic extends wepy.page {
   config = {
-    navigationBarTitleText: 'Topic'
+    navigationBarTitleText: 'Ruby China',
+    enablePullDownRefresh: true
   }
-
   data = {
+    topicId: null,
     topic: {},
-    page: 1,
-    perPage: 30
+    parsedBody: {},
+    replies: [],
+    isLoadingReplies: false
   }
 
   computed = {
+    createdDate () {
+      return this.formatDate(this.topic.created_At)
+    }
+  }
 
+  methods = {
+  }
+
+  onLoad (option) {
+    this.topicId = option.id
+    this.fetchData()
+  }
+  onReachBottom () {
+
+  }
+  onPullDownRefresh () {
+    console.log('onPullDownRefresh')
+    this.reset()
+  }
+  reset () {
+    this.replies = []
+    this.fetchData()
+  }
+
+  formatDate (date) {
+    return moment(this.topic.created_at).format('YYYY年MM月D日')
+  }
+
+  fetchData () {
+    console.log('fetch data')
+
+    api.queryTopicDetail(this.topicId).then((data) => {
+      this.topic = data.topic
+      this.parsedBody = wemark.parse(this.topic.body, this, {
+        name: 'parsedBody'
+      })
+      console.log(this.topic)
+      this.$apply()
+
+      this.fetchRepliesData()
+    })
+  }
+  parseMarkdown (md) {
+    return wemark.parse(this.topic.body, this)
+  }
+
+  fetchRepliesData () {
+    if (this.replies.length < 1) {
+      this.isLoadingReplies = true
+      api.queryReplies(this.topicId).then((data) => {
+        data.replies.forEach(rep => {
+          rep.parsedBody = wemark.parse(rep.body, this, {
+            name: 'parsedBody'
+          })
+        })
+
+        this.replies = data.replies
+        console.log(this.replies)
+        this.isLoadingReplies = false
+        this.$apply()
+      })
+    }
   }
 
   setTitle (title) {
@@ -31,15 +184,6 @@ export default class Topic extends wepy.page {
       title: title
     })
   }
-
-  methods = {
-    onLoad: function(option){
-      this.setTitle('test')
-      console.log(option.id)
-    }
-  }
-
-
 }
 
 </script>

@@ -3,15 +3,29 @@
 </style>
 
 <template>
+  <view>
+    <repeat for="{{topics}}" index="index" item="topic" key="topic.id" >
 
+      <topic-item :topic="topic">
+      </topic-item>
+    </repeat>
+  </view>
 </template>
 
 <script>
 import wepy from 'wepy'
+import api from '../mixins/api'
+import TopicItem from '../components/topicItem'
+
 
 export default class Topics extends wepy.page {
   config = {
-    navigationBarTitleText: '帖子'
+    navigationBarTitleText: '帖子',
+    enablePullDownRefresh: true
+  }
+
+  components = {
+    'topic-item': TopicItem
   }
 
   data = {
@@ -21,11 +35,32 @@ export default class Topics extends wepy.page {
   }
 
   computed = {
+  }
 
+  onPullDownRefresh () {
+    console.log('refresh')
+    this.fetchData()
+  }
+
+  onLoad () {
+    console.log('loaded popular')
+    this.fetchData()
+  }
+
+  fetchData () {
+    wepy.showNavigationBarLoading()
+    api.queryTopics(1).then((data) => {
+      this.topics = data.topics
+
+      console.log(this.topics)
+      wepy.hideNavigationBarLoading()
+      wepy.stopPullDownRefresh()
+
+      this.$apply()
+    })
   }
 
   methods = {
-
   }
 }
 

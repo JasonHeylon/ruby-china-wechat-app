@@ -47,7 +47,7 @@ export default class Popular extends wepy.page {
     this.fetchData()
   }
 
-  onPullDownRefresh (){
+  onPullDownRefresh () {
     console.log('refresh')
     this.fetchData()
   }
@@ -56,11 +56,12 @@ export default class Popular extends wepy.page {
     wepy.showNavigationBarLoading()
     api.queryPopularTopics(1).then((data) => {
       this.topics = data.topics
-      this.$apply()
 
       console.log(this.topics)
       wepy.hideNavigationBarLoading()
       wepy.stopPullDownRefresh()
+
+      this.$apply()
     })
   }
 }

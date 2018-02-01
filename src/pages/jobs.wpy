@@ -3,21 +3,57 @@
 </style>
 
 <template>
+  <view>
+    <repeat for="{{topics}}" index="index" item="topic" key="topic.id" >
 
+      <topic-item :topic="topic">
+      </topic-item>
+    </repeat>
+  </view>
 </template>
 
 <script>
 import wepy from 'wepy'
+import api from '../mixins/api'
+import TopicItem from '../components/topicItem'
 
 export default class Jobs extends wepy.page {
   config = {
-    navigationBarTitleText: '招聘'
+    navigationBarTitleText: '招聘',
+    enablePullDownRefresh: true
+  }
+
+  components = {
+    'topic-item': TopicItem
   }
 
   data = {
     topics: [],
     page: 1,
     perPage: 30
+  }
+
+  onPullDownRefresh () {
+    console.log('refresh')
+    this.fetchData()
+  }
+
+  onLoad () {
+    console.log('loaded popular')
+    this.fetchData()
+  }
+
+  fetchData () {
+    wepy.showNavigationBarLoading()
+    api.queryJobs(1).then((data) => {
+      this.topics = data.topics
+
+      console.log(this.topics)
+      wepy.hideNavigationBarLoading()
+      wepy.stopPullDownRefresh()
+
+      this.$apply()
+    })
   }
 
   computed = {
