@@ -9,6 +9,9 @@
       <topic-item :topic="topic">
       </topic-item>
     </repeat>
+    <view if="isLoading" class="load-more">
+      正在加载...
+    </view>
   </view>
 </template>
 
@@ -26,10 +29,12 @@ export default class Popular extends wepy.page {
   components = {
     'topic-item': TopicItem
   }
+
   data = {
     topics: [],
     page: 1,
-    perPage: 30
+    perPage: 30,
+    isLoading: true
   }
 
   computed = {
@@ -37,10 +42,7 @@ export default class Popular extends wepy.page {
   }
 
   methods = {
-    request () {
-      console.log('clicked')
-      this.fetchData()
-    }
+
   }
   onLoad () {
     console.log('loaded popular')
@@ -49,13 +51,27 @@ export default class Popular extends wepy.page {
 
   onPullDownRefresh () {
     console.log('refresh')
+    this.page = 1
+    this.topics = []
+    this.fetchData()
+  }
+
+  onReachBottom () {
+    this.page = this.page + 1
     this.fetchData()
   }
 
   fetchData () {
     wepy.showNavigationBarLoading()
-    api.queryPopularTopics(1).then((data) => {
-      this.topics = data.topics
+
+    this.isLoading = true
+    api.queryPopularTopics(this.page).then((data) => {
+      if (data.topics.length > 0) {
+        this.topics.push.apply(this.topics, data.topics)
+      } else {
+        this.hasMore = false
+      }
+      this.isLoading = false
 
       console.log(this.topics)
       wepy.hideNavigationBarLoading()

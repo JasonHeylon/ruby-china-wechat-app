@@ -9,6 +9,9 @@
       <topic-item :topic="topic">
       </topic-item>
     </repeat>
+    <view if="isLoading" class="load-more">
+      正在加载...
+    </view>
   </view>
 </template>
 
@@ -31,7 +34,7 @@ export default class Topics extends wepy.page {
   data = {
     topics: [],
     page: 1,
-    perPage: 30
+    hasMore: true
   }
 
   computed = {
@@ -42,6 +45,11 @@ export default class Topics extends wepy.page {
     this.fetchData()
   }
 
+  onReachBottom () {
+    this.page = this.page + 1
+    this.fetchData()
+  }
+
   onLoad () {
     console.log('loaded popular')
     this.fetchData()
@@ -49,8 +57,12 @@ export default class Topics extends wepy.page {
 
   fetchData () {
     wepy.showNavigationBarLoading()
-    api.queryTopics(1).then((data) => {
-      this.topics = data.topics
+    api.queryTopics(this.page).then((data) => {
+      if (data.topics.length > 0) {
+        this.topics.push.apply(this.topics, data.topics)
+      } else {
+        this.hasMore = false
+      }
 
       console.log(this.topics)
       wepy.hideNavigationBarLoading()

@@ -10,6 +10,7 @@
       position: relative;
       font-weight: bold;
       display: flex;
+      text { width: 100%; }
       image {
         width: 80rpx;
         height: 80rpx;
@@ -19,7 +20,7 @@
     }
     .topic-desc {
       color: #777;
-      font-size: .8rem;
+      font-size: .6rem;
     }
     .topic-body {
       padding: 20rpx;
@@ -35,16 +36,7 @@
       border-right: 0;
     }
 
-    .reply-item {
-      padding: 10rpx 20rpx;
-      border-bottom: 1px solid #e1e1e1;
-      image {
-        width: 80rpx;
-        height: 80rpx;
-        border-radius: 50%;
-        background-color:#ddd;
-      }
-    }
+
   }
 </style>
 
@@ -53,13 +45,12 @@
     <import src="../plugins/wemark.wxml" />
     <view class="topic-head">
       <view class="topic-title">
-        {{ topic.title }}
+        <text>{{ topic.title }}</text>
         <image mode="aspectFill" src="{{topic.user.avatar_url}}"></image>
       </view>
       <view class="topic-desc">
         {{ topic.user.name ? topic.user.name : topic.user.login }}
-        - 发布于 {{ createdDate }}
-        - {{ topic.hits }} 次阅读
+        - 发布于 {{ createdDate }} - {{ topic.hits }} 次阅读
       </view>
 
     </view>
@@ -73,31 +64,22 @@
     </view>
 
     <view class="reply-list">
-      <view wx:if="{{isLoadingReplies}}">
+      <repeat for="{{replies}}" index="index" item="reply" key="reply.id">
+        <reply-item reply="reply"></reply-item>
+      </repeat>
+
+      <view class="load-more" if="{{hasMore && isLoadingReplies}}">
         加载回复中...
       </view>
-      <repeat for="{{replies}}" index="index" item="reply" key="reply.id">
-        <view class="reply-item">
-          <view>
-            <image mode="aspectFill" src="{{reply.user.avatar_url}}"></image>
-            {{reply.user.login}}
-          </view>
-          <view class="reply-body">
-            <template is="wemark" data="{{...reply.parsedBody}}"></template>
-          </view>
-          <view class="reply-footer">
-            {{ reply.created_at }}
-          </view>
-
-        </view>
-      </repeat>
     </view>
   </view>
 </template>
 
 <script>
 import wepy from 'wepy'
+import ReplyItem from '../components/replyItem'
 import api from '../mixins/api'
+
 import wemark from '../plugins/wemark'
 import moment from 'moment'
 
@@ -111,7 +93,13 @@ export default class Topic extends wepy.page {
     topic: {},
     parsedBody: {},
     replies: [],
-    isLoadingReplies: false
+    isLoadingReplies: false,
+    page: 1,
+    hasMore: true
+  }
+
+  components = {
+    'reply-item': ReplyItem
   }
 
   computed = {
@@ -126,9 +114,14 @@ export default class Topic extends wepy.page {
   onLoad (option) {
     this.topicId = option.id
     this.fetchData()
+    console.log('topic ready!!')
   }
   onReachBottom () {
-
+    console.log('onreach bottom' + this.hasMore)
+    if (this.hasMore) {
+      this.page = this.page + 1
+      this.fetchRepliesData()
+    }
   }
   onPullDownRefresh () {
     console.log('onPullDownRefresh')
@@ -137,6 +130,8 @@ export default class Topic extends wepy.page {
   reset () {
     this.replies = []
     this.fetchData()
+    this.page = 1
+    this.fetchRepliesData()
   }
 
   formatDate (date) {
@@ -148,9 +143,7 @@ export default class Topic extends wepy.page {
 
     api.queryTopicDetail(this.topicId).then((data) => {
       this.topic = data.topic
-      this.parsedBody = wemark.parse(this.topic.body, this, {
-        name: 'parsedBody'
-      })
+      this.parsedBody = wemark.parse(this.topic.body)
       console.log(this.topic)
       this.$apply()
 
@@ -162,21 +155,25 @@ export default class Topic extends wepy.page {
   }
 
   fetchRepliesData () {
-    if (this.replies.length < 1) {
-      this.isLoadingReplies = true
-      api.queryReplies(this.topicId).then((data) => {
-        data.replies.forEach(rep => {
-          rep.parsedBody = wemark.parse(rep.body, this, {
-            name: 'parsedBody'
-          })
-        })
+    this.isLoadingReplies = true
 
-        this.replies = data.replies
-        console.log(this.replies)
-        this.isLoadingReplies = false
-        this.$apply()
-      })
-    }
+    api.queryReplies(this.topicId, this.page).then((data) => {
+
+      if (data.replies.length > 0) {
+        data.replies.forEach(r => {
+          r.parsedBody = wemark.parse(r.body)
+        })
+        this.replies.push.apply(this.replies, data.replies.filter(r => { return !r.action } ))
+      } else {
+        this.hasMore = false
+      }
+
+      console.log(this.replies)
+
+      this.isLoadingReplies = false
+      this.$apply()
+    })
+
   }
 
   setTitle (title) {

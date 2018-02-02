@@ -3,7 +3,7 @@ var parser = new Remarkable({
 	html: true
 });
 
-function parse(md, page, options){
+function parse(md, options){
 
 	if(!options) options = {};
 	if(!options.name) options.name = 'wemark';

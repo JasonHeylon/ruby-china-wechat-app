@@ -1,5 +1,10 @@
 <style lang='scss'>
   page {}
+
+  .load-more {
+    text-align: center;
+    width: 100%;
+  }
 </style>
 
 <script>
@@ -42,7 +47,7 @@ export default class extends wepy.app {
 
       ]
     },
-    debug: true
+    // debug: true
   }
 
   globalData = {

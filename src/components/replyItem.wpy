@@ -1,0 +1,76 @@
+<style lang="scss">
+  @import '../plugins/wemark.scss';
+  .reply-item {
+    position: relative;
+    padding: 10rpx 20rpx;
+    padding-left: 120rpx;
+    border-bottom: 1px solid #e1e1e1;
+    image {
+      position: absolute;
+      left: 15rpx;
+      top: 15rpx;
+      width: 80rpx;
+      height: 80rpx;
+      border-radius: 50%;
+      background-color:#ddd;
+    }
+    .reply-content {
+      min-height: 60rpx;
+    }
+  }
+</style>
+
+<template>
+
+<view class="reply-item">
+  <import src="../plugins/wemark.wxml" />
+  <image mode="aspectFill" src="{{reply.user.avatar_url}}"></image>
+  <view class="reply-content">
+    <view>
+      {{reply.user.login}}
+    </view>
+    <view class="reply-body">
+      <template is="wemark" data="{{...reply.parsedBody}}"></template>
+    </view>
+    <view class="reply-footer">
+      {{ reply.created_at }}
+    </view>
+  </view>
+
+</view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import wemark from '../plugins/wemark'
+
+export default class ReplyItem extends wepy.component {
+  props = {
+    reply: {
+      default: {}
+    }
+  }
+
+  data = {
+  }
+
+  computed = {
+    parsedBody () {
+      return wemark.parse(this.reply.body)
+    }
+  }
+
+
+
+  ready () {
+    console.log('ready')
+    // this.parseBody = wemark.parse(this.reply.body)
+    // console.log(this.parseBody)
+    // this.$apply()
+  }
+
+  methods = {
+
+  }
+}
+</script>
