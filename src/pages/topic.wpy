@@ -76,7 +76,7 @@
 <script>
 import wepy from 'wepy'
 import ReplyItem from '../components/replyItem'
-import api from '../mixins/api'
+import api from '../utilities/api'
 
 // import wemark from '../plugins/wemark'
 import moment from 'moment'
@@ -105,7 +105,7 @@ export default class Topic extends wepy.page {
 
   computed = {
     createdDate () {
-      return this.formatDate(this.topic.created_At)
+      return this.formatDate(this.topic.created_at)
     }
   }
 
@@ -168,7 +168,6 @@ export default class Topic extends wepy.page {
       this.isLoadingReplies = false
       this.$apply()
     })
-
   }
 
   setTitle (title) {

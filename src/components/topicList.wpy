@@ -1,0 +1,105 @@
+<style lang="scss">
+  .load-more {
+    text-align: center;
+    width: 100%;
+  }
+</style>
+
+<template>
+  <block>
+    <repeat for="{{topics}}" key="index" index="index" item="topic">
+      <topic-item :topic="topic">
+      </topic-item>
+    </repeat>
+    <view if="isLoading" class="load-more">
+      正在加载...
+    </view>
+  </block>
+</template>
+
+<script>
+import wepy from 'wepy'
+import TopicItem from '../components/topicItem'
+import api from '../utilities/api'
+
+export default class TopicList extends wepy.component {
+  props = {
+    topicsType: {
+      type: String,
+      default: 'topics'
+    }
+  }
+
+  data = {
+    topics: [],
+    page: 0,
+    hasMore: true
+  }
+
+  components = {
+    'topic-item': TopicItem
+  }
+
+  computed = {
+  }
+
+  events = {
+    'refreshTopics': () => {
+      this.page = 1
+      this._fetchData(true)
+    },
+    'fetchMoreTopics': () => {
+      if (!this.hasMore) {
+        return
+      }
+      this.page++
+      this._fetchData()
+    }
+  }
+
+  _fetchData (replace = false) {
+    wepy.showNavigationBarLoading()
+    this.isLoading = true
+    let request = this._getRequestByType()
+
+    request(this.page).then((data) => {
+      if (data.topics.length > 0) {
+        if (replace) {
+          this.topics = data.topics
+        } else {
+          this.topics.push.apply(this.topics, data.topics)
+        }
+      } else {
+        this.hasMore = false
+      }
+      this.isLoading = false
+
+      wepy.hideNavigationBarLoading()
+      wepy.stopPullDownRefresh()
+
+      this.$apply()
+    })
+  }
+
+
+  _getRequestByType () {
+    switch (this.topicsType) {
+      case 'topics':
+        return api.queryTopics
+        break
+      case 'popular':
+        return api.queryPopularTopics
+        break
+      case 'jobs':
+        return api.queryJobs
+        break
+      default:
+        return api.queryPopularTopics
+        break
+    }
+  }
+
+  methods = {
+  }
+}
+</script>

@@ -1,82 +1,44 @@
 <style>
-
 </style>
 
 <template>
   <view>
-    <repeat for="{{topics}}" index="index" item="topic" key="topic.id" >
-
-      <topic-item :topic="topic">
-      </topic-item>
-    </repeat>
-    <view if="isLoading" class="load-more">
-      正在加载...
-    </view>
+    <topic-list topicsType="jobs">
+    </topic-list>
   </view>
 </template>
 
 <script>
 import wepy from 'wepy'
-import api from '../mixins/api'
-import TopicItem from '../components/topicItem'
+import TopicList from '../components/topicList'
 
-export default class Jobs extends wepy.page {
+export default class Popular extends wepy.page {
   config = {
     navigationBarTitleText: '招聘',
     enablePullDownRefresh: true
   }
 
   components = {
-    'topic-item': TopicItem
+    'topic-list': TopicList
   }
 
   data = {
-    topics: [],
-    page: 1,
-    hasMore: true
+  }
+
+  computed = {}
+
+  methods = {}
+
+  onLoad () {
+    this.$broadcast('refreshTopics')
   }
 
   onPullDownRefresh () {
-    console.log('refresh')
-    this.topics = []
-    this.page = 1
-    this.fetchData()
+    this.$broadcast('refreshTopics')
   }
+
   onReachBottom () {
-    this.page = this.page + 1
-    this.fetchData()
-  }
-
-  onLoad () {
-    console.log('loaded popular')
-    this.fetchData()
-  }
-
-  fetchData () {
-    wepy.showNavigationBarLoading()
-    console.log(this.page)
-    api.queryJobs(this.page).then((data) => {
-      if (data.topics.length > 0) {
-        this.topics.push.apply(this.topics, data.topics)
-      } else {
-        this.hasMore = false
-      }
-
-      console.log(this.topics)
-      wepy.hideNavigationBarLoading()
-      wepy.stopPullDownRefresh()
-
-      this.$apply()
-    })
-  }
-
-  computed = {
-
-  }
-
-  methods = {
-
+    this.$broadcast('fetchMoreTopics')
   }
 }
-
 </script>
