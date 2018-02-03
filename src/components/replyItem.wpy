@@ -1,5 +1,4 @@
 <style lang="scss">
-  @import '../plugins/wemark.scss';
   .reply-item {
     position: relative;
     padding: 10rpx 20rpx;
@@ -23,17 +22,16 @@
 <template>
 
 <view class="reply-item">
-  <import src="../plugins/wemark.wxml" />
   <image mode="aspectFill" src="{{reply.user.avatar_url}}"></image>
   <view class="reply-content">
     <view>
       {{reply.user.login}}
     </view>
     <view class="reply-body">
-      <template is="wemark" data="{{...reply.parsedBody}}"></template>
+      <markdown-viewer content="{{reply.body}}" wx:if="{{reply.body}}"></markdown-viewer>
     </view>
     <view class="reply-footer">
-      {{ reply.created_at }}
+      {{ formated_created_at }}
     </view>
   </view>
 
@@ -42,7 +40,7 @@
 
 <script>
 import wepy from 'wepy'
-import wemark from '../plugins/wemark'
+import moment from 'moment'
 
 export default class ReplyItem extends wepy.component {
   props = {
@@ -55,18 +53,9 @@ export default class ReplyItem extends wepy.component {
   }
 
   computed = {
-    parsedBody () {
-      return wemark.parse(this.reply.body)
+    formated_created_at () {
+      return moment(this.reply.created_at).format('Y-M-D H:m')
     }
-  }
-
-
-
-  ready () {
-    console.log('ready')
-    // this.parseBody = wemark.parse(this.reply.body)
-    // console.log(this.parseBody)
-    // this.$apply()
   }
 
   methods = {

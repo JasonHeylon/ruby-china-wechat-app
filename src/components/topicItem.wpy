@@ -3,7 +3,7 @@
     display: flex;
   }
   .topic-item{
-    padding: 15rpx 10rpx;
+    padding: 20rpx 15rpx;
     display: flex;
     border-bottom: 1px solid #F0F0F0;
     font-size: 30rpx;

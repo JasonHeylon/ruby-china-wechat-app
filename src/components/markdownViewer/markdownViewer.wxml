@@ -1,0 +1,9 @@
+<import src="../../plugins/wemark/wemark.wxml" />
+<!-- <import src="../../plugins/wxParse/wxParse.wxml"/> -->
+
+<view class="parsed-markdown-article">
+  <block wx:if="parsedContent.length > 0">
+    <template is="wemark" data="{{...parsedContent}}"></template>
+    <!-- <template is="wxParse" data="{{wxParseData:parsedContent.nodes}}" /> -->
+  </block>
+</view>

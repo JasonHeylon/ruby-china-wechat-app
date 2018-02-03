@@ -5,7 +5,6 @@
 <template>
   <view>
     <repeat for="{{topics}}" index="index" item="topic" key="topic.id">
-
       <topic-item :topic="topic">
       </topic-item>
     </repeat>
@@ -23,7 +22,10 @@ import TopicItem from '../components/topicItem'
 export default class Popular extends wepy.page {
   config = {
     navigationBarTitleText: '精华帖子',
-    enablePullDownRefresh: true
+    enablePullDownRefresh: true,
+    usingComponents: {
+      'topic-list': '../components/topicList/topicList'
+    }
   }
 
   components = {

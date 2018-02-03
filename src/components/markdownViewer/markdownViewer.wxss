@@ -1,0 +1,11 @@
+// @import "../../plugins/wxParse/wxParse.wxss";
+@import "../../plugins/wemark/wemark.wxss";
+.wemark_block_code {
+	color: #444;
+	background-color: #f9f9f9;
+	margin-bottom: 10rpx;
+}
+.wemark_inline_code,
+.wemark_inline_text {
+  word-break: normal;
+}
