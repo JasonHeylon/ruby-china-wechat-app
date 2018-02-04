@@ -1,7 +1,4 @@
 <style lang="scss">
-  .flex {
-    display: flex;
-  }
   .topic-item{
     padding: 20rpx 15rpx;
     display: flex;
@@ -23,8 +20,9 @@
     }
 
     .topic-node-name {
-      color: #777;
+      color: rgb(110, 104, 82);
       display: inline;
+      margin-right: 10rpx;
     }
     .topic-title {
       display: inline;
@@ -44,6 +42,7 @@
     .topic-author {
       color: #777;
       margin-top: 15rpx;
+      font-size: 25rpx;
     }
   }
 
@@ -69,7 +68,7 @@
       </view>
 
       <view class="topic-author">
-        {{ username }}
+        {{ topic.user.name.length > 0 ? topic.user.name : topic.user.login }}
       </view>
     </view>
   </view>
@@ -89,6 +88,7 @@ export default class TopicItem extends wepy.component {
   }
 
   computed = {
+    // 外层repeat 中computed 返回有问题
     username () {
       if (this.topic) {
         return this.topic.user.name.length > 0 ? this.topic.user.name : this.topic.user.login

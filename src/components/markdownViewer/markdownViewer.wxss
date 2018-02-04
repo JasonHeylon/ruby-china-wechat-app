@@ -1,4 +1,3 @@
-// @import "../../plugins/wxParse/wxParse.wxss";
 @import "../../plugins/wemark/wemark.wxss";
 .wemark_block_code {
 	color: #444;

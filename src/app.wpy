@@ -39,9 +39,8 @@ export default class extends wepy.app {
           text: '招聘',
           selectedColor: '#E84920'
         }
-
       ]
-    },
+    }
     // debug: true
   }
 

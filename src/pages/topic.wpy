@@ -34,8 +34,6 @@
       border-left: 0;
       border-right: 0;
     }
-
-
   }
 </style>
 
@@ -50,7 +48,6 @@
         {{ topic.user.name ? topic.user.name : topic.user.login }}
         - 发布于 {{ createdDate }} - {{ topic.hits }} 次阅读
       </view>
-
     </view>
 
     <view class="topic-body">
@@ -61,24 +58,16 @@
       共收到{{topic.replies_count}} 个回复， {{ topic.likes_count }} 个赞
     </view>
 
-    <view class="reply-list">
-      <repeat for="{{replies}}" index="index" item="reply" key="reply.id">
-        <reply-item reply="reply"></reply-item>
-      </repeat>
+    <reply-list :topicId.sync="topicId">
+    </reply-list>
 
-      <view class="load-more" if="{{hasMore && isLoadingReplies}}">
-        加载回复中...
-      </view>
-    </view>
   </view>
 </template>
 
 <script>
 import wepy from 'wepy'
-import ReplyItem from '../components/replyItem'
 import api from '../utilities/api'
-
-// import wemark from '../plugins/wemark'
+import ReplyList from '../components/replyList'
 import moment from 'moment'
 
 export default class Topic extends wepy.page {
@@ -89,23 +78,20 @@ export default class Topic extends wepy.page {
       'markdown-viewer': '../components/markdownViewer/markdownViewer'
     }
   }
+
   data = {
     topicId: null,
     topic: {},
-    parsedBody: {},
-    replies: [],
-    isLoadingReplies: false,
-    page: 1,
-    hasMore: true
+    parsedBody: {}
   }
 
   components = {
-    'reply-item': ReplyItem
+    'reply-list': ReplyList
   }
 
   computed = {
     createdDate () {
-      return this.formatDate(this.topic.created_at)
+      return moment(this.topic.created_at).format('Y-M-D H:m')
     }
   }
 
@@ -115,66 +101,21 @@ export default class Topic extends wepy.page {
   onLoad (option) {
     this.topicId = option.id
     this.fetchData()
-    console.log('topic ready!!')
   }
   onReachBottom () {
-    console.log('onreach bottom' + this.hasMore)
-    if (this.hasMore) {
-      this.page = this.page + 1
-      this.fetchRepliesData()
-    }
-  }
-  onPullDownRefresh () {
-    console.log('onPullDownRefresh')
-    this.reset()
-  }
-  reset () {
-    this.replies = []
-    this.fetchData()
-    this.page = 1
-    this.fetchRepliesData()
+    this.$broadcast('fetchMoreReplies')
   }
 
-  formatDate (date) {
-    return moment(this.topic.created_at).format('YYYY年MM月D日')
+  onPullDownRefresh () {
+    this.fetchData()
+    this.$broadcast('refreshReplies')
   }
 
   fetchData () {
-    console.log('fetch data')
-
     api.queryTopicDetail(this.topicId).then((data) => {
       this.topic = data.topic
-      console.log(this.topic)
       this.$apply()
-
-      this.fetchRepliesData()
-    })
-  }
-
-
-  fetchRepliesData () {
-    this.isLoadingReplies = true
-
-    api.queryReplies(this.topicId, this.page).then((data) => {
-
-      if (data.replies.length > 0) {
-        this.replies.push.apply(this.replies, data.replies.filter(r => { return !r.action } ))
-      } else {
-        this.hasMore = false
-      }
-
-      console.log(this.replies)
-
-      this.isLoadingReplies = false
-      this.$apply()
-    })
-  }
-
-  setTitle (title) {
-    wepy.setNavigationBarTitle({
-      title: title
     })
   }
 }
-
 </script>

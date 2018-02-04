@@ -49,17 +49,15 @@ export default class TopicList extends wepy.component {
       this._fetchData(true)
     },
     'fetchMoreTopics': () => {
-      if (!this.hasMore) {
-        return
+      if (this.hasMore) {
+        this.page++
+        this._fetchData()
       }
-      this.page++
-      this._fetchData()
     }
   }
 
   _fetchData (replace = false) {
-    wepy.showNavigationBarLoading()
-    this.isLoading = true
+    this._setLoading(true)
     let request = this._getRequestByType()
 
     request(this.page).then((data) => {
@@ -72,30 +70,32 @@ export default class TopicList extends wepy.component {
       } else {
         this.hasMore = false
       }
-      this.isLoading = false
-
-      wepy.hideNavigationBarLoading()
-      wepy.stopPullDownRefresh()
+      this._setLoading(false)
 
       this.$apply()
     })
   }
 
+  _setLoading (isLoading = false) {
+    this.isLoading = isLoading
+    if (this.isLoading) {
+      wepy.showNavigationBarLoading()
+    } else {
+      wepy.hideNavigationBarLoading()
+      wepy.stopPullDownRefresh()
+    }
+  }
 
   _getRequestByType () {
     switch (this.topicsType) {
       case 'topics':
         return api.queryTopics
-        break
       case 'popular':
         return api.queryPopularTopics
-        break
       case 'jobs':
         return api.queryJobs
-        break
       default:
         return api.queryPopularTopics
-        break
     }
   }
 

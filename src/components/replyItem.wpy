@@ -31,7 +31,7 @@
       <markdown-viewer content="{{reply.body}}" wx:if="{{reply.body}}"></markdown-viewer>
     </view>
     <view class="reply-footer">
-      {{ formated_created_at }}
+      {{ reply.created_at }}
     </view>
   </view>
 
@@ -53,8 +53,9 @@ export default class ReplyItem extends wepy.component {
   }
 
   computed = {
-    formated_created_at () {
-      return moment(this.reply.created_at).format('Y-M-D H:m')
+    createdDate () {
+      return ''
+      // return moment(this.reply.created_at).format('Y-M-D H:m')
     }
   }
 

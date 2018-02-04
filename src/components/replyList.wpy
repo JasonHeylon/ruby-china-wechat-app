@@ -1,0 +1,95 @@
+<style lang="scss">
+  .load-more {
+    text-align: center;
+    width: 100%;
+  }
+</style>
+
+<template>
+  <view class="reply-list">
+    <repeat for="{{replies}}" index="index" item="reply" key="index">
+      <reply-item :reply="reply"></reply-item>
+    </repeat>
+
+    <view wx:if="{{isLoading}}" class="load-more">
+      正在加载...
+    </view>
+
+    <view wx:if="{{!hasMore}}" class="load-more">
+      到底了..
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import ReplyItem from './replyItem'
+import api from '../utilities/api'
+
+export default class ReplyList extends wepy.component {
+  props = {
+    topicId: {
+      default: null
+    }
+  }
+
+  data = {
+    replies: [],
+    page: 0,
+    hasMore: true,
+    isLoading: true
+  }
+
+  components = {
+    'reply-item': ReplyItem
+  }
+
+  computed = {
+  }
+
+  events = {
+    'refreshReplies': () => {
+      this.page = 1
+      this._fetchData(true)
+    },
+    'fetchMoreReplies': () => {
+      if (this.hasMore) {
+        this.page++
+        this._fetchData()
+      }
+    }
+  }
+
+  _fetchData (replace = false) {
+    this._setLoading(true)
+
+    api.queryReplies(this.topicId, this.page).then((data) => {
+      if (data.replies.length > 0) {
+        let replies = data.replies.filter(r => { return !r.action })
+        if (replace) {
+          this.replies = replies
+        } else {
+          this.replies.push.apply(this.replies, replies)
+        }
+      } else {
+        this.hasMore = false
+      }
+      this._setLoading(false)
+      this.$apply()
+    })
+  }
+
+  _setLoading (isLoading = false) {
+    this.isLoading = isLoading
+    if (this.isLoading) {
+      wepy.showNavigationBarLoading()
+    } else {
+      wepy.hideNavigationBarLoading()
+      wepy.stopPullDownRefresh()
+    }
+  }
+
+  methods = {
+  }
+}
+</script>
