@@ -4,6 +4,9 @@
     display: flex;
     border-bottom: 1px solid #F0F0F0;
     font-size: 30rpx;
+    &:active {
+      background-color: #eee;
+    }
     .author-avatar {
       margin-right:20rpx;
       image {

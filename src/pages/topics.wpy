@@ -14,7 +14,7 @@ import TopicList from '../components/topicList'
 
 export default class Popular extends wepy.page {
   config = {
-    navigationBarTitleText: '精华帖子',
+    navigationBarTitleText: '社区',
     enablePullDownRefresh: true
   }
 
