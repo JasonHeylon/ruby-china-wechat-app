@@ -40,7 +40,6 @@
 
 <script>
 import wepy from 'wepy'
-import moment from 'moment'
 
 export default class ReplyItem extends wepy.component {
   props = {
@@ -53,10 +52,6 @@ export default class ReplyItem extends wepy.component {
   }
 
   computed = {
-    createdDate () {
-      return ''
-      // return moment(this.reply.created_at).format('Y-M-D H:m')
-    }
   }
 
   methods = {
